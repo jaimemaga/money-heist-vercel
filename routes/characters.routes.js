@@ -1,10 +1,13 @@
 const express = require('express');
 const Character = require('../models/Characters.js');
 const createError = require('../utils/errors/create-error.js');
+const isAuthJWT = require('../utils/middlewares/auth-jwt.middleware.js');
+const isAuthPassport = require('../utils/middlewares/auth-passport.middleware.js');
+const upload = require('../utils/middlewares/file.middleware.js');
 
 const charactersRouter = express.Router();
 
-charactersRouter.get('/', async (req, res, next) => {
+charactersRouter.get('/', [isAuthJWT], async (req, res, next) => {
     try {
         const characters = await Character.find();
         // .json(datos) == .send(datos) pero me los transforma directamente al formato correcto para objetos
@@ -14,7 +17,7 @@ charactersRouter.get('/', async (req, res, next) => {
     }
 });
 
-charactersRouter.get('/:id', async (req, res, next) => {
+charactersRouter.get('/:id', [isAuthPassport], async (req, res, next) => {
     const id = req.params.id;
     try {
         const character = await Character.findById(id);
@@ -56,11 +59,15 @@ charactersRouter.get('/skill/:skill', async (req, res, next) => {
     }
 });
 
-charactersRouter.post('/', async (req, res, next) => {
+// Upload (multer) tiene dos modos:
+// - single --> si solo queremos subir 1 archivo (nombre cambo body donde va el archivo)
+// - array --> varios archivos (nombre del campo donde van los archivos, numero archivos)
+charactersRouter.post('/', [upload.single('picture')], async (req, res, next) => {
     try {
+        const picture = req.file ? req.file.filename : null;
         // New Character nos permite crear un nuevo documento de la colección indicada
         // IMPORTANTE: Solo podemos insertar documentos en nuestra base de datos.
-        const newCharacter = new Character({ ...req.body });
+        const newCharacter = new Character({ ...req.body, picture });
         // Save: guarda el documento sobre el que se ejecute en su colección de la base de datos.
         const createdCharacter = await newCharacter.save();
         // Status 201 para simbolizar que el elemento ha sido creado correctamente

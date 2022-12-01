@@ -20,7 +20,8 @@ const characterSchema = new mongoose.Schema(
                 values: ["Hacker", "Militar", "Conductor", "Lider", "Peleador", "Acróbata"],
                 message: "Esta no es una habilidad valiosa para un atracador. "
             }
-        }
+        },
+        picture: String
     },
     {
         // Timestamps: Nos añade la fecha de creación y de edición de cada elemento al documento guardado en la BD.

@@ -7,6 +7,11 @@ const locationsRouter = require('./routes/locations.routes.js');
 const passport = require('passport');
 const userRouter = require('./routes/user.routes.js');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
+const path = require("path");
+
+
+const DB_URL = "mongodb+srv://root:GKNM0qCJZ5Sjz7uN@moneyheist.8rg8c8y.mongodb.net/?retryWrites=true&w=majority";
 
 // Me conecta a la base de datos.
 connect();
@@ -14,12 +19,20 @@ connect();
 const PORT = 3000;
 const server = express();
 
+// Setea la variable a nivel de nuestra aplicación, haciéndola recuperable desde la request
+// - Clave
+// - Valor
+server.set("secretKey", "moneHeistApi");
+
 // Evita errores de CORS, instalar antes la dependencia cors --> npm install --save cors
 server.use(cors());
 // Nos permite parsear los body de las peticiones POST y PUT que vienen como JSON
 server.use(express.json());
 // Nos permite parsear los body de las peticiones POST y PUT que vienen como string o array
 server.use(express.urlencoded({ extended: false }));
+
+// Express.static nos crea la ruta en la que se servirán archivos estáticos
+server.use(express.static(path.join(__dirname, 'public')));
 
 // Inicializar y configurar passport
 // Ejecuta el archivo de passport
@@ -32,8 +45,12 @@ server.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        maxAge: 60000 // Milisegundos hasta que la cookie caduca
-    }
+        maxAge: 120000 // Milisegundos hasta que la cookie caduca
+    },
+    // Store: Almacen donde se guardan las sesiones activas de los usuarios
+    store: MongoStore.create({
+        mongoUrl: DB_URL
+    })
 }));
 
 // Inicializa passport
