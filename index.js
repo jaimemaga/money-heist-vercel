@@ -67,6 +67,10 @@ server.use(passport.initialize());
 // Utilizamos la sesión con passport
 server.use(passport.session());
 
+server.get('/', (req, res) => {
+    res.json("Bienvenido a mi API de la Casa de Papel!");
+});
+
 // Rutas
 server.use('/user', userRouter);
 server.use('/characters', charactersRouter);
