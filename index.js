@@ -87,3 +87,5 @@ server.use((err, req, res, next) => {
 server.listen(PORT, () => {
     console.log(`El servidor está escuchando en http://localhost:${PORT}`);
 });
+
+module.exports = server;
