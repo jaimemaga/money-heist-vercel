@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const getJWT = (userInfo, secretKey) => {
+const getJWT = (userInfo) => {
     // Sign --> crea y firma un token nuevo
     // - Payload: Información que queramos pasar en nuestro token
     // - Clave secreta
@@ -10,7 +10,7 @@ const getJWT = (userInfo, secretKey) => {
             id: userInfo._id,
             email: userInfo._email
         },
-        secretKey,
+        process.env.JWT_SECRET_KEY,
         {
             expiresIn: 120
         }

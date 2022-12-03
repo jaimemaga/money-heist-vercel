@@ -4,6 +4,9 @@ const createError = require('../utils/errors/create-error.js');
 const isAuthJWT = require('../utils/middlewares/auth-jwt.middleware.js');
 const isAuthPassport = require('../utils/middlewares/auth-passport.middleware.js');
 const upload = require('../utils/middlewares/file.middleware.js');
+const imageToUri = require('image-to-uri');
+const fs = require('fs');
+const uploadToCloudinary = require('../utils/middlewares/cloudinary.middleware.js');
 
 const charactersRouter = express.Router();
 
@@ -72,6 +75,32 @@ charactersRouter.post('/', [upload.single('picture')], async (req, res, next) =>
         const createdCharacter = await newCharacter.save();
         // Status 201 para simbolizar que el elemento ha sido creado correctamente
         // Devuelvo el elemento creado como respuesta
+        return res.status(201).json(createdCharacter);
+    } catch (err) {
+        next(err);
+    }
+});
+
+charactersRouter.post('/with-uri', [upload.single('picture')], async (req, res, next) => {
+    try {
+        // file.path tiene la ruta dentro de nuestro servidor de la imagen subida
+        const filePath = req.file ? req.file.path : null;
+        // imageToUri convierte a Base64 el archivo con el path que le indiquemos
+        const picture = imageToUri(filePath);
+        const newCharacter = new Character({ ...req.body, picture });
+        const createdCharacter = await newCharacter.save();
+        // Eliminar el archivo subido por multer debido a que ya está guardado en a DB como URI.
+        await fs.unlinkSync(filePath);
+        return res.status(201).json(createdCharacter);
+    } catch (err) {
+        next(err);
+    }
+});
+
+charactersRouter.post('/to-cloud', [upload.single('picture'), uploadToCloudinary], async (req, res, next) => {
+    try {
+        const newCharacter = new Character({ ...req.body, picture: req.file_url });
+        const createdCharacter = await newCharacter.save();
         return res.status(201).json(createdCharacter);
     } catch (err) {
         next(err);

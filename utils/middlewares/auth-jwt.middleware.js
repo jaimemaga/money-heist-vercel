@@ -18,7 +18,7 @@ const isAuthJWT = (req, res, next) => {
         // Verify: verifica que el token es válido y en caso de que lo sea devuelve su payload
         // - Token a verificar
         // - Clave secreta
-        payload = jwt.verify(token, req.app.get("secretKey"));
+        payload = jwt.verify(token, process.env.JWT_SECRET_KEY);
     } catch (err) {
         return next(err);
     }

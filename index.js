@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const charactersRouter = require('./routes/characters.routes.js');
 const connect = require('./utils/db/connect.js');
@@ -9,20 +11,27 @@ const userRouter = require('./routes/user.routes.js');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const path = require("path");
+const cloudinary = require("cloudinary");
 
 
-const DB_URL = "mongodb+srv://root:GKNM0qCJZ5Sjz7uN@moneyheist.8rg8c8y.mongodb.net/?retryWrites=true&w=majority";
+const DB_URL = process.env.DB_URL;
 
 // Me conecta a la base de datos.
 connect();
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const server = express();
+
+cloudinary.config({ 
+    cloud_name: process.env.CLOUD_NAME, 
+    api_key: process.env.CLOUD_API_KEY, 
+    api_secret: process.env.CLOUD_SECRET 
+});
 
 // Setea la variable a nivel de nuestra aplicación, haciéndola recuperable desde la request
 // - Clave
 // - Valor
-server.set("secretKey", "moneHeistApi");
+// server.set("secretKey", process.env.JWT_SECRET_KEY);
 
 // Evita errores de CORS, instalar antes la dependencia cors --> npm install --save cors
 server.use(cors());
@@ -41,7 +50,7 @@ require('./utils/authentication/passport.js');
 // Creamos gestión de sesiones
 // Recibe config de la sesión
 server.use(session({
-    secret: 'hola_mundo',
+    secret: process.env.SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
