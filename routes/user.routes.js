@@ -4,6 +4,7 @@ const User = require('../models/Users');
 const createError = require('../utils/errors/create-error');
 const bcrypt = require('bcrypt');
 const getJWT = require('../utils/authentication/jsonwebtoken');
+const isAuthPassport = require('../utils/middlewares/auth-passport.middleware');
 
 const userRouter = express.Router();
 
@@ -59,6 +60,10 @@ userRouter.post('/login', (req, res, next) => {
     // 1. Nombre de la estrategia a utilizar
     // 2. Callback done
     passport.authenticate('login', done)(req);
+});
+
+userRouter.get('/me', [isAuthPassport], (req, res, next) => {
+    return res.status(200).json(req.user);
 });
 
 userRouter.post('/logout', (req, res, next) => {

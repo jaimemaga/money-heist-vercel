@@ -31,10 +31,22 @@ cloudinary.config({
 // Setea la variable a nivel de nuestra aplicación, haciéndola recuperable desde la request
 // - Clave
 // - Valor
-// server.set("secretKey", process.env.JWT_SECRET_KEY);
+// server.set("secretKey", process.env.JWT_SECRET_KEY)
 
-// Evita errores de CORS, instalar antes la dependencia cors --> npm install --save cors
-server.use(cors());
+const whitelist = ['http://localhost:3000', 'http://localhost:4200', 'https://winter-meteor-969038.postman.co' /** other domains if any */ ]
+const corsOptions = {
+  credentials: true,
+  origin: function(origin, callback) {
+    console.log(origin);
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+};
+server.use(cors(corsOptions));
+
 // Nos permite parsear los body de las peticiones POST y PUT que vienen como JSON
 server.use(express.json());
 // Nos permite parsear los body de las peticiones POST y PUT que vienen como string o array

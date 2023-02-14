@@ -11,7 +11,7 @@ const characterSchema = new mongoose.Schema(
         // Max: === con valor máximo
         // Unique: EL valor debe ser único en ese documento dentro de la colección
         // Enum: El valor de la propiedad tendrá que estar entre los indicados en el array
-        name: { type: String, required: true },
+        name: { type: String, required: true, minlength: 5 },
         alias: { type: String, unique: true, required: true },
         age: { type: Number, min: [10, "Eres muy pequeño para ser atracador!"], max: 100 },
         skills: {
